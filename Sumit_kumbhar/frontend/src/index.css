@@ -1,0 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-neutral-50 text-slate-800 font-sans antialiased overflow-x-hidden min-h-screen pb-20 md:pb-0;
+    background-image: radial-gradient(at 0% 0%, rgba(255, 111, 0, 0.04) 0px, transparent 50%),
+                      radial-gradient(at 100% 100%, rgba(255, 215, 0, 0.04) 0px, transparent 50%);
+  }
+}
+
+/* Custom premium design elements */
+.glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  @apply shadow-premium rounded-2xl;
+}
+
+.festive-bg {
+  background: linear-gradient(135deg, #FF6F00 0%, #D84315 100%);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Mobile-friendly click animations */
+.btn-tap {
+  @apply active:scale-95 transition-transform duration-75 select-none;
+}
+
+/* Quick swipe horizontal list hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom styles for printing */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    padding: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-card {
+    border: none !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
