@@ -1,0 +1,161 @@
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { AlertCircle, Lock, User, Sparkles, Building, Phone } from 'lucide-react';
+
+const Register: React.FC = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [businessName, setBusinessName] = useState<string>('');
+  const [phone, setPhone] = useState<string>('');
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!username.trim() || !password.trim() || !businessName.trim() || !phone.trim()) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    setError('');
+    setSubmitting(true);
+    try {
+      await register(username.trim(), password.trim(), businessName.trim(), phone.trim());
+      navigate('/', { replace: true });
+    } catch (err: any) {
+      setError(err.message || 'Registration failed.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-premium space-y-6">
+        
+        {/* Branding header */}
+        <div className="text-center space-y-2">
+          <div className="inline-flex p-3.5 bg-orange-50 text-festive-saffron rounded-2xl shadow-sm">
+            <Sparkles className="w-6 h-6 animate-pulse" />
+          </div>
+          <h1 className="text-xl font-extrabold text-slate-900 tracking-tight">Create Owner Account</h1>
+          <p className="text-xs text-slate-400 font-semibold">Sign up to separate your bookings and stock counts</p>
+        </div>
+
+        {error && (
+          <div className="flex items-center gap-2 rounded-xl bg-red-50 p-4 text-xs text-red-700 border border-red-100 shadow-sm">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              Username
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                <User className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Choose a username..."
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              Store / Business Name
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                <Building className="w-4 h-4" />
+              </span>
+              <input
+                type="text"
+                required
+                value={businessName}
+                onChange={(e) => setBusinessName(e.target.value)}
+                placeholder="e.g. SK Arts or Bappa Arts"
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              WhatsApp Phone Number (Owner)
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                <Phone className="w-4 h-4" />
+              </span>
+              <input
+                type="tel"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="e.g. 8459356016"
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400">
+                <Lock className="w-4 h-4" />
+              </span>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Choose a password..."
+                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full flex items-center justify-center py-4 bg-festive-saffron hover:bg-orange-600 text-white font-extrabold rounded-xl text-sm transition-all btn-tap shadow-lg shadow-orange-500/20 disabled:opacity-50"
+          >
+            {submitting ? (
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+            ) : (
+              'Create Account'
+            )}
+          </button>
+        </form>
+
+        <div className="text-center pt-2 border-t border-slate-100">
+          <p className="text-xs text-slate-500">
+            Already have an owner account?{' '}
+            <Link to="/login" className="font-extrabold text-festive-saffron hover:underline">
+              Log In
+            </Link>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default Register;
+export { Register };
