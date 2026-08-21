@@ -9,7 +9,7 @@ import { connectDB } from './config/db';
 import apiRouter from './routes/api';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || "5000", 10);
 
 // Connect to MongoDB Database
 connectDB();
@@ -39,6 +39,6 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Express server running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0" , () => {
+  console.log(`Express server running on ${PORT}`);
 });
