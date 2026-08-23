@@ -131,7 +131,6 @@ const BookingDetails: React.FC = () => {
       (booking.size ? `📏 *Size / Height:* ${booking.size}\n` : '') +
       (booking.price ? `💵 *Total Price:* ₹${booking.price.toLocaleString()}\n` : '') +
       (imageLink ? `📷 *Idol Photo Preview:* ${imageLink}\n` : '') +
-      `🔗 *View booking online:* ${window.location.origin}/bookings/${booking._id}\n\n` +
       `Thank you for booking with ${shopName}!`;
 
     const cleanPhone = (booking.phone || '').replace(/\D/g, '');
