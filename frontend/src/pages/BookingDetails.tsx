@@ -67,47 +67,9 @@ const BookingDetails: React.FC = () => {
       setCopying(false);
     }
   };
-  const dataURLtoBlob = (dataurl: string) => {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)![1];
-    const bstr = atob(arr[arr.length - 1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], { type: mime });
-  };
-
-  const uploadImageToTempShare = async (base64Str: string): Promise<string> => {
-    try {
-      const blob = dataURLtoBlob(base64Str);
-      const formData = new FormData();
-      formData.append('file', blob, `${booking?.bookingId || 'idol'}.jpg`);
-      
-      const res = await fetch('https://tmpfiles.org/api/v1/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const json = await res.json();
-      if (json.status === 'success' && json.data?.url) {
-        // Replace to direct download link so WhatsApp crawler downloads it
-        return json.data.url.replace('https://tmpfiles.org/', 'https://tmpfiles.org/dl/');
-      }
-    } catch (err) {
-      console.error('Anonymous image upload failed:', err);
-    }
-    return '';
-  };
-
   const handleWhatsAppShare = async () => {
     if (!booking) return;
     setSharing(true);
-    let imageLink = '';
-
-    if (displayPhoto) {
-      imageLink = await uploadImageToTempShare(displayPhoto);
-    }
 
     const dateFormatted = new Date(booking.bookingDate).toLocaleDateString('en-IN', {
       day: 'numeric',
@@ -130,7 +92,7 @@ const BookingDetails: React.FC = () => {
       `🕉️ *Idol Name:* ${booking.idolName}\n` +
       (booking.size ? `📏 *Size / Height:* ${booking.size}\n` : '') +
       (booking.price ? `💵 *Total Price:* ₹${booking.price.toLocaleString()}\n` : '') +
-      (imageLink ? `📷 *Idol Photo Preview:* ${imageLink}\n` : '') +
+      (displayPhoto ? `📷 *Idol Photo Preview:* ${displayPhoto}\n` : '') +
       `Thank you for booking with ${shopName}!`;
 
     const cleanPhone = (booking.phone || '').replace(/\D/g, '');
