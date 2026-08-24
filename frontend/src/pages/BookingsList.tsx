@@ -26,10 +26,21 @@ const BookingsList: React.FC = () => {
     loadBookings();
   }, []);
 
-  // Filter bookings locally by Customer Name
+  // Filter bookings locally by Customer Name, Booking ID, Custom Idol ID, Phone, or Model Name
   const filteredBookings = bookings.filter((booking) => {
     const customer = booking.customerName || '';
-    return customer.toLowerCase().includes(searchQuery.toLowerCase());
+    const bookingId = booking.bookingId || '';
+    const customIdolId = booking.customIdolId || '';
+    const phone = booking.phone || '';
+    const idolName = booking.idolName || '';
+    const query = searchQuery.toLowerCase();
+    return (
+      customer.toLowerCase().includes(query) ||
+      bookingId.toLowerCase().includes(query) ||
+      customIdolId.toLowerCase().includes(query) ||
+      phone.toLowerCase().includes(query) ||
+      idolName.toLowerCase().includes(query)
+    );
   });
 
   if (loading) {
@@ -57,7 +68,7 @@ const BookingsList: React.FC = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm shadow-premium"
-          placeholder="Search by customer name (e.g. Rahul)..."
+          placeholder="Search by customer, booking ID, phone, model, or custom ID..."
         />
       </div>
 
@@ -96,9 +107,16 @@ const BookingsList: React.FC = () => {
               <div className="flex-1 min-w-0 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start gap-1">
-                    <h3 className="font-bold text-slate-900 text-sm truncate">
-                      {booking.customerName || 'Unnamed Booking'}
-                    </h3>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-slate-900 text-sm truncate">
+                        {booking.customerName || 'Unnamed Booking'}
+                      </h3>
+                      {booking.customIdolId && (
+                        <span className="inline-block mt-1 text-[11px] font-extrabold text-festive-saffron bg-orange-50 border border-orange-100 px-2.5 py-0.5 rounded-lg">
+                          Custom ID: {booking.customIdolId}
+                        </span>
+                      )}
+                    </div>
                     <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border leading-tight uppercase ${
                       booking.status === 'Cancelled' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-orange-50 text-orange-700 border-orange-100'
                     }`}>

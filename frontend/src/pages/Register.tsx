@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle, Lock, User, Sparkles, Building, Phone } from 'lucide-react';
+import { AlertCircle, Lock, User, Sparkles, Building, Phone, Eye, EyeOff } from 'lucide-react';
 
 const Register: React.FC = () => {
   const { register } = useAuth();
@@ -13,11 +13,25 @@ const Register: React.FC = () => {
   const [phone, setPhone] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const validatePhone = (num: string): boolean => {
+    const digits = num.replace(/\D/g, '');
+    if (digits.length === 10) return true;
+    if (digits.length === 11 && digits.startsWith('0')) return true;
+    if (digits.length === 12 && digits.startsWith('91')) return true;
+    return false;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!username.trim() || !password.trim() || !businessName.trim() || !phone.trim()) {
       setError('Please fill in all fields.');
+      return;
+    }
+
+    if (!validatePhone(phone.trim())) {
+      setError('Please enter a valid 10-digit mobile number.');
       return;
     }
 
@@ -120,13 +134,20 @@ const Register: React.FC = () => {
                 <Lock className="w-4 h-4" />
               </span>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Choose a password..."
-                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+                className="block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-650 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 

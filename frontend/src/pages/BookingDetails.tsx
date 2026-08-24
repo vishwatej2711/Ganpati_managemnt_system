@@ -33,17 +33,17 @@ const BookingDetails: React.FC = () => {
   }, [id]);
 
   const handleCancelBooking = async () => {
-    if (!window.confirm('Are you sure you want to cancel this booking? This will restore 1 count of this idol back to the inventory (if it was a stock item).')) {
+    if (!window.confirm('Are you sure you want to delete this booking? This will restore 1 count of this idol back to the inventory (if it was a stock item) and permanently delete the booking from the database and Excel backup.')) {
       return;
     }
     
     setCancelling(true);
     try {
-      const res = await api.put(`/bookings/${id}/cancel`);
-      setBooking(res.data);
-      alert('Booking cancelled successfully.');
+      await api.put(`/bookings/${id}/cancel`);
+      alert('Booking deleted successfully.');
+      navigate('/bookings');
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Failed to cancel booking.');
+      alert(err.response?.data?.message || 'Failed to delete booking.');
     } finally {
       setCancelling(false);
     }
@@ -81,6 +81,7 @@ const BookingDetails: React.FC = () => {
     const textMessage = 
       `*${shopName} Booking Receipt*\n\n` +
       `🚩 *Booking ID:* ${booking.bookingId}\n` +
+      (booking.customIdolId ? `🆔 *Custom Idol ID:* ${booking.customIdolId}\n` : '') +
       `👤 *Customer Name:* ${booking.customerName || 'N/A'}\n` +
       (booking.clothesDescription ? `👗 *Vastra:* ${booking.clothesDescription}\n` : '') +
       (booking.description ? `📝 *Description:* ${booking.description}\n` : '') +
@@ -157,7 +158,14 @@ const BookingDetails: React.FC = () => {
         <div className="flex justify-between items-start border-b border-slate-100 pb-4">
           <div>
             <span className="text-xs text-slate-400 font-bold tracking-widest uppercase">Ganpati Order</span>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight mt-0.5">{booking.bookingId}</h1>
+            <div className="flex items-center gap-2 mt-0.5">
+              <h1 className="text-xl font-black text-slate-900 tracking-tight">{booking.bookingId}</h1>
+              {booking.customIdolId && (
+                <span className="text-xs font-extrabold text-festive-saffron bg-orange-50 border border-orange-100 px-2.5 py-1 rounded-xl">
+                  ID: {booking.customIdolId}
+                </span>
+              )}
+            </div>
           </div>
           <div>
             <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full border leading-tight uppercase ${
@@ -195,6 +203,13 @@ const BookingDetails: React.FC = () => {
               <span className="text-slate-400 font-medium">Selected Model</span>
               <span className="text-slate-900 font-bold">{booking.idolName}</span>
             </div>
+
+            {booking.customIdolId && (
+              <div className="flex justify-between border-b border-slate-50 pb-1.5">
+                <span className="text-slate-400 font-medium">Custom Idol ID</span>
+                <span className="text-slate-900 font-bold">{booking.customIdolId}</span>
+              </div>
+            )}
 
             {booking.customerName && (
               <div className="flex justify-between border-b border-slate-50 pb-1.5">
@@ -299,15 +314,13 @@ const BookingDetails: React.FC = () => {
             </div>
           )}
 
-          {!isCancelled && (
-            <button
-              onClick={handleCancelBooking}
-              disabled={cancelling}
-              className="w-full py-3 bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 font-bold rounded-xl text-xs transition-all btn-tap flex items-center justify-center gap-1.5"
-            >
-              Cancel Booking Order
-            </button>
-          )}
+          <button
+            onClick={handleCancelBooking}
+            disabled={cancelling}
+            className="w-full py-3 bg-red-50 text-red-700 border border-red-100 hover:bg-red-100 font-bold rounded-xl text-xs transition-all btn-tap flex items-center justify-center gap-1.5"
+          >
+            Delete Booking Order
+          </button>
         </div>
 
       </div>

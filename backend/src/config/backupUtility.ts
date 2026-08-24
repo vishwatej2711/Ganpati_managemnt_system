@@ -31,6 +31,7 @@ export async function backupOwnerBookings(ownerId: string): Promise<string> {
     // 3. Compile CSV columns
     const headers = [
       'Booking ID',
+      'Custom Idol ID',
       'Customer Name',
       'Phone Number',
       'Selected Model',
@@ -55,6 +56,7 @@ export async function backupOwnerBookings(ownerId: string): Promise<string> {
 
       const dataRow = [
         csvCell(b.bookingId),
+        csvCell(b.customIdolId || 'N/A'),
         csvCell(b.customerName || 'N/A'),
         csvCell(b.phone || 'N/A'),
         csvCell(b.idolName),

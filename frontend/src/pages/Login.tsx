@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { AlertCircle, Lock, User, Sparkles } from 'lucide-react';
+import { AlertCircle, Lock, User, Sparkles, Eye, EyeOff } from 'lucide-react';
 
 const Login: React.FC = () => {
   const { login } = useAuth();
@@ -11,6 +11,7 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const from = location.state?.from?.pathname || '/';
 
@@ -82,13 +83,20 @@ const Login: React.FC = () => {
                 <Lock className="w-4 h-4" />
               </span>
               <input
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Type your password..."
-                className="block w-full pl-10 pr-3 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+                className="block w-full pl-10 pr-10 py-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-650 focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 

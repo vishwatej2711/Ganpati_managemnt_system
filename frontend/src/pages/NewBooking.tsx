@@ -20,6 +20,7 @@ const NewBooking: React.FC = () => {
   const [size, setSize] = useState<string>('');
   const [price, setPrice] = useState<string>('');
   const [advanceAmount, setAdvanceAmount] = useState<string>('0');
+  const [customIdolId, setCustomIdolId] = useState<string>('');
   const [clothesDescription, setClothesDescription] = useState<string>('');
   const [description, setDescription] = useState<string>('');
   
@@ -60,6 +61,14 @@ const NewBooking: React.FC = () => {
     }
   };
 
+  const validatePhone = (num: string): boolean => {
+    const digits = num.replace(/\D/g, '');
+    if (digits.length === 10) return true;
+    if (digits.length === 11 && digits.startsWith('0')) return true;
+    if (digits.length === 12 && digits.startsWith('91')) return true;
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedIdolId) {
@@ -68,6 +77,11 @@ const NewBooking: React.FC = () => {
     }
     if (selectedIdolId === 'custom' && !customIdolName.trim()) {
       setError('Please enter a custom idol name.');
+      return;
+    }
+
+    if (phone.trim() && !validatePhone(phone.trim())) {
+      setError('Please enter a valid 10-digit mobile number.');
       return;
     }
 
@@ -88,6 +102,7 @@ const NewBooking: React.FC = () => {
       if (advanceAmount !== '') formData.append('advanceAmount', advanceAmount);
       if (clothesDescription.trim()) formData.append('clothesDescription', clothesDescription.trim());
       if (description.trim()) formData.append('description', description.trim());
+      if (customIdolId.trim()) formData.append('customIdolId', customIdolId.trim());
       
       if (photoFile) {
         formData.append('photo', photoFile);
@@ -212,7 +227,7 @@ const NewBooking: React.FC = () => {
           <h2 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2">
             Idol Booking Details (Optional)
           </h2>
-          <div className="grid gap-3 grid-cols-2">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1">Size / Height</label>
               <input
@@ -242,6 +257,17 @@ const NewBooking: React.FC = () => {
                 value={advanceAmount}
                 onChange={(e) => setAdvanceAmount(e.target.value)}
                 placeholder="e.g. 2000"
+                className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">Custom Idol ID (e.g. Chalk No.)</label>
+              <input
+                type="text"
+                value={customIdolId}
+                onChange={(e) => setCustomIdolId(e.target.value)}
+                placeholder="e.g. Chalk No. 45"
                 className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
               />
             </div>

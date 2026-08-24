@@ -179,6 +179,11 @@ const Dashboard: React.FC = () => {
                     <p className="font-bold text-slate-900 text-xs truncate leading-tight">
                       {booking.customerName || 'No Name'}
                     </p>
+                    {booking.customIdolId && (
+                      <span className="inline-block mt-0.5 text-[9px] font-extrabold text-festive-saffron bg-orange-50 border border-orange-50 px-1.5 py-0.2 rounded-md">
+                        ID: {booking.customIdolId}
+                      </span>
+                    )}
                     <p className="text-[10px] text-slate-500 font-semibold leading-tight mt-0.5">
                       {booking.idolName} {booking.size ? `• ${booking.size}` : ''}
                     </p>
@@ -186,7 +191,7 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="text-right flex-shrink-0 pl-2">
-                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border border-orange-100 uppercase ${booking.status === 'Cancelled' ? 'bg-slate-100 text-slate-500 border-slate-200' : 'bg-orange-50 text-orange-700'
+                  <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border border-orange-100 uppercase ${booking.status === 'Cancelled' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-orange-50 text-orange-700'
                     }`}>
                     {booking.status}
                   </span>

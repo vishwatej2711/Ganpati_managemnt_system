@@ -32,7 +32,13 @@ export async function getBookings(req: AuthRequest, res: Response) {
 
     if (search) {
       const searchStr = String(search).trim();
-      query.customerName = { $regex: searchStr, $options: 'i' };
+      query.$or = [
+        { customerName: { $regex: searchStr, $options: 'i' } },
+        { bookingId: { $regex: searchStr, $options: 'i' } },
+        { phone: { $regex: searchStr, $options: 'i' } },
+        { customIdolId: { $regex: searchStr, $options: 'i' } },
+        { idolName: { $regex: searchStr, $options: 'i' } }
+      ];
     }
 
     const bookings = await Booking.find(query).sort({ createdAt: -1 });
@@ -97,7 +103,10 @@ export async function createBooking(req: AuthRequest, res: Response) {
       advanceAmount,
       clothesDescription,
       description,
+      customIdolId,
     } = req.body;
+
+    console.log('createBooking req.body:', req.body);
 
     if (!idolId) {
       return res.status(400).json({ message: 'Please select an idol or choose Custom.' });
@@ -148,6 +157,7 @@ export async function createBooking(req: AuthRequest, res: Response) {
         advanceAmount: advanceAmount !== undefined && advanceAmount !== '' ? Number(advanceAmount) : 0,
         clothesDescription: clothesDescription || undefined,
         description: description || undefined,
+        customIdolId: customIdolId || undefined,
         photo: photoUrl || undefined,
         bookingDate: new Date(),
         status: 'Booked',
@@ -193,9 +203,12 @@ export async function updateBooking(req: AuthRequest, res: Response) {
       advanceAmount,
       clothesDescription,
       description,
+      customIdolId,
       clearPhoto, // 'true' or 'false'
       status,
     } = req.body;
+
+    console.log('updateBooking req.body:', req.body);
 
     try {
       const booking = await Booking.findOne({ _id: req.params.id, owner: req.user.id });
@@ -210,6 +223,7 @@ export async function updateBooking(req: AuthRequest, res: Response) {
       booking.advanceAmount = advanceAmount !== undefined && advanceAmount !== '' ? Number(advanceAmount) : 0;
       booking.clothesDescription = clothesDescription || undefined;
       booking.description = description || undefined;
+      booking.customIdolId = customIdolId || undefined;
 
       // Handle Cloudinary Image replacements and deletions
       if (clearPhoto === 'true') {
@@ -263,22 +277,13 @@ export async function cancelBooking(req: AuthRequest, res: Response) {
       return res.status(404).json({ message: 'Booking not found or access denied.' });
     }
 
-    if (booking.status === 'Cancelled') {
-      return res.status(400).json({ message: 'Booking is already cancelled.' });
-    }
-
-    booking.status = 'Cancelled';
-
-    // Delete image from Cloudinary on cancellation to conserve storage
+    // Delete image from Cloudinary on deletion to conserve storage
     if (booking.photo) {
       const oldPublicId = getPublicIdFromUrl(booking.photo);
       if (oldPublicId) {
         deleteFromCloudinary(oldPublicId); // non-blocking background task
       }
-      booking.photo = undefined;
     }
-
-    await booking.save();
 
     // Return stock count
     if (booking.idolId) {
@@ -289,13 +294,16 @@ export async function cancelBooking(req: AuthRequest, res: Response) {
       }
     }
 
-    // Trigger local Excel CSV backup
+    // Permanently delete the booking from the database
+    await Booking.deleteOne({ _id: req.params.id, owner: req.user.id });
+
+    // Trigger local Excel CSV backup (which will now omit this booking)
     await backupOwnerBookings(req.user.id);
 
-    return res.json(booking);
+    return res.json({ message: 'Booking deleted successfully.', success: true });
   } catch (error) {
-    console.error('Error cancelling booking:', error);
-    return res.status(500).json({ message: 'Error cancelling booking.' });
+    console.error('Error deleting booking:', error);
+    return res.status(500).json({ message: 'Error deleting booking.' });
   }
 }
 

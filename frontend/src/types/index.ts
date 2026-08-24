@@ -10,6 +10,7 @@ export interface Idol {
 export interface Booking {
   _id: string;
   bookingId: string;
+  customIdolId?: string;
   idolId?: string; // Optional for custom idols
   idolName: string;
   customerName?: string;

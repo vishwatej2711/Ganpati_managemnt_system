@@ -21,6 +21,7 @@ const EditBooking: React.FC = () => {
   const [advanceAmount, setAdvanceAmount] = useState<string>('');
   const [clothesDescription, setClothesDescription] = useState<string>('');
   const [description, setDescription] = useState<string>('');
+  const [customIdolId, setCustomIdolId] = useState<string>('');
   
   // Photo file, local preview, and clear indicators
   const [photoFile, setPhotoFile] = useState<File | null>(null);
@@ -43,6 +44,7 @@ const EditBooking: React.FC = () => {
         setAdvanceAmount(data.advanceAmount !== undefined ? String(data.advanceAmount) : '0');
         setClothesDescription(data.clothesDescription || '');
         setDescription(data.description || '');
+        setCustomIdolId(data.customIdolId || '');
         setPhotoPreview(data.photo || '');
         setPhotoFile(null);
         setClearPhoto(false);
@@ -70,10 +72,24 @@ const EditBooking: React.FC = () => {
     }
   };
 
+  const validatePhone = (num: string): boolean => {
+    const digits = num.replace(/\D/g, '');
+    if (digits.length === 10) return true;
+    if (digits.length === 11 && digits.startsWith('0')) return true;
+    if (digits.length === 12 && digits.startsWith('91')) return true;
+    return false;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setSaving(true);
+
+    if (phone.trim() && !validatePhone(phone.trim())) {
+      setError('Please enter a valid 10-digit mobile number.');
+      setSaving(false);
+      return;
+    }
 
     try {
       const formData = new FormData();
@@ -84,6 +100,7 @@ const EditBooking: React.FC = () => {
       if (advanceAmount !== '') formData.append('advanceAmount', advanceAmount);
       if (clothesDescription.trim()) formData.append('clothesDescription', clothesDescription.trim());
       if (description.trim()) formData.append('description', description.trim());
+      formData.append('customIdolId', customIdolId.trim()); // send empty string if cleared to allow deleting it
       
       if (photoFile) {
         formData.append('photo', photoFile);
@@ -141,7 +158,7 @@ const EditBooking: React.FC = () => {
         >
           <ArrowLeft className="w-4 h-4" /> Cancel Edit
         </button>
-        <h1 className="text-sm font-bold text-slate-800">Edit Booking BK-{booking.bookingId}</h1>
+        <h1 className="text-sm font-bold text-slate-800">Edit Booking {booking.bookingId}</h1>
       </div>
 
       {error && (
@@ -187,7 +204,7 @@ const EditBooking: React.FC = () => {
             Idol Booking Details
           </h2>
 
-          <div className="grid gap-3 grid-cols-2">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-semibold text-slate-500 mb-1">Size / Height</label>
               <input
@@ -223,6 +240,16 @@ const EditBooking: React.FC = () => {
               <div className="w-full px-3 py-3 bg-slate-100 border border-slate-100 rounded-xl text-slate-900 font-extrabold text-sm">
                 ₹{remainingAmount.toLocaleString()}
               </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-500 mb-1">Custom Idol ID (e.g. Chalk No.)</label>
+              <input
+                type="text"
+                value={customIdolId}
+                onChange={(e) => setCustomIdolId(e.target.value)}
+                className="block w-full px-3 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-festive-saffron text-sm"
+              />
             </div>
 
             <div className="col-span-2">

@@ -13,6 +13,7 @@ export interface IBooking extends Document {
   color?: string;
   clothesDescription?: string;
   description?: string; // generic description/notes
+  customIdolId?: string; // Custom ID for customer's idol
   photo?: string; // base64 string
   bookingDate: Date;
   status: 'Booked' | 'Cancelled';
@@ -34,6 +35,7 @@ const BookingSchema = new Schema<IBooking>(
     color: { type: String, trim: true },
     clothesDescription: { type: String, trim: true },
     description: { type: String, trim: true },
+    customIdolId: { type: String, trim: true },
     photo: { type: String }, // base64 photo
     bookingDate: { type: Date, default: Date.now },
     status: { type: String, enum: ['Booked', 'Cancelled'], default: 'Booked' },
@@ -45,6 +47,6 @@ const BookingSchema = new Schema<IBooking>(
 BookingSchema.index({ owner: 1, bookingId: 1 }, { unique: true });
 
 // Text index for searches
-BookingSchema.index({ customerName: 'text', phone: 'text', bookingId: 'text', idolName: 'text' });
+BookingSchema.index({ customerName: 'text', phone: 'text', bookingId: 'text', idolName: 'text', customIdolId: 'text' });
 
 export const Booking = model<IBooking>('Booking', BookingSchema);

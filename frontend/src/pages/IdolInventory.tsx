@@ -424,7 +424,7 @@ const IdolInventory: React.FC = () => {
             return (
               <div
                 key={idol._id}
-                className="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-premium flex justify-between items-center gap-3"
+                className="bg-white rounded-2xl border border-slate-200 p-3.5 shadow-premium flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   {idol.photo ? (
@@ -454,19 +454,21 @@ const IdolInventory: React.FC = () => {
                 </div>
 
                 {/* Adjust buttons and Actions */}
-                <div className="flex items-center gap-1.5 flex-shrink-0">
-                  <button
-                    onClick={() => handleDecrement(idol._id)}
-                    className="w-9 h-9 bg-slate-100 active:bg-slate-200 border border-slate-200 rounded-xl text-slate-600 font-extrabold text-xs flex items-center justify-center btn-tap"
-                  >
-                    -
-                  </button>
-                  <button
-                    onClick={() => handleIncrement(idol._id)}
-                    className="w-9 h-9 bg-slate-100 active:bg-slate-200 border border-slate-200 rounded-xl text-slate-600 font-extrabold text-xs flex items-center justify-center btn-tap"
-                  >
-                    +
-                  </button>
+                <div className="flex items-center justify-between sm:justify-end gap-1.5 flex-shrink-0 pt-2 sm:pt-0 border-t border-slate-50 sm:border-t-0">
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleDecrement(idol._id)}
+                      className="w-9 h-9 bg-slate-100 active:bg-slate-200 border border-slate-200 rounded-xl text-slate-600 font-extrabold text-xs flex items-center justify-center btn-tap"
+                    >
+                      -
+                    </button>
+                    <button
+                      onClick={() => handleIncrement(idol._id)}
+                      className="w-9 h-9 bg-slate-100 active:bg-slate-200 border border-slate-200 rounded-xl text-slate-600 font-extrabold text-xs flex items-center justify-center btn-tap"
+                    >
+                      +
+                    </button>
+                  </div>
 
                   <div className="flex gap-0.5 ml-1 pl-1.5 border-l border-slate-100">
                     <button
