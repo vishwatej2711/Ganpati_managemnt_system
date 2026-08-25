@@ -23,6 +23,7 @@ router.get('/dashboard/stats', dashboardController.getDashboardStats as any);
 // --- Booking Routes ---
 router.get('/bookings', bookingController.getBookings as any);
 router.get('/bookings/export', bookingController.exportBookings as any);
+router.get('/backups/download-zip', bookingController.downloadBackupsZip as any);
 router.get('/bookings/:id', bookingController.getBookingById as any);
 router.post('/bookings', bookingController.createBooking as any);
 router.put('/bookings/:id', bookingController.updateBooking as any);

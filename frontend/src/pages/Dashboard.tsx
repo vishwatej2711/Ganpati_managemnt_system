@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import type { Booking, DashboardStats } from '../types';
-import { PlusSquare, Calendar, LayoutGrid, ClipboardList, AlertCircle, ShoppingBag, Layers } from 'lucide-react';
+import { PlusSquare, Calendar, LayoutGrid, ClipboardList, AlertCircle, ShoppingBag, Layers, FolderArchive } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [downloading, setDownloading] = useState<boolean>(false);
+  const [downloadingZip, setDownloadingZip] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
 
@@ -27,6 +28,26 @@ const Dashboard: React.FC = () => {
       alert('Could not download backup. Please check connection.');
     } finally {
       setDownloading(false);
+    }
+  };
+
+  const handleDownloadZipBackup = async () => {
+    try {
+      setDownloadingZip(true);
+      const response = await api.get('/backups/download-zip', { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/zip' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'bookings_backups_archive.zip');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download backups ZIP:', error);
+      alert('Could not download backups ZIP. Please check connection.');
+    } finally {
+      setDownloadingZip(false);
     }
   };
 
@@ -116,6 +137,24 @@ const Dashboard: React.FC = () => {
             <div className="text-left">
               <span className="text-sm font-bold text-slate-800 block">Download Excel Backup</span>
               <span className="text-[11px] text-slate-400 font-medium">Export all bookings to Excel-compatible sheet</span>
+            </div>
+          </button>
+
+          <button
+            onClick={handleDownloadZipBackup}
+            disabled={downloadingZip}
+            className="col-span-2 bg-white rounded-2xl border border-slate-200 p-4 shadow-premium hover:border-slate-300 transition-all flex items-center gap-4 text-left w-full btn-tap disabled:opacity-50"
+          >
+            <div className="p-3 bg-blue-50 text-blue-600 rounded-full">
+              {downloadingZip ? (
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
+              ) : (
+                <FolderArchive className="w-6 h-6" />
+              )}
+            </div>
+            <div className="text-left">
+              <span className="text-sm font-bold text-slate-800 block">Download Backups ZIP</span>
+              <span className="text-[11px] text-slate-400 font-medium">Download zip of all CSV backups files</span>
             </div>
           </button>
         </div>

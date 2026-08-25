@@ -5,6 +5,9 @@ import { AuthRequest } from '../middleware/auth';
 import { backupOwnerBookings } from '../config/backupUtility';
 import { upload } from '../middleware/upload';
 import { uploadToCloudinary, deleteFromCloudinary, getPublicIdFromUrl } from '../config/cloudinary';
+import path from 'path';
+import fs from 'fs';
+import AdmZip from 'adm-zip';
 
 // Helper to generate sequential Booking ID (scoped to owner)
 async function generateBookingId(ownerId: string): Promise<string> {
@@ -322,5 +325,43 @@ export async function exportBookings(req: AuthRequest, res: Response) {
   } catch (error) {
     console.error('Error exporting bookings CSV:', error);
     return res.status(500).json({ message: 'Error exporting backup file.' });
+  }
+}
+
+export async function downloadBackupsZip(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ message: 'Authentication required.' });
+  }
+
+  try {
+    const backupsDir = path.join(process.cwd(), 'backups');
+    if (!fs.existsSync(backupsDir)) {
+      fs.mkdirSync(backupsDir, { recursive: true });
+    }
+
+    const files = fs.readdirSync(backupsDir);
+    const zip = new AdmZip();
+    let hasFiles = false;
+
+    files.forEach((file) => {
+      const filePath = path.join(backupsDir, file);
+      if (fs.statSync(filePath).isFile()) {
+        zip.addLocalFile(filePath);
+        hasFiles = true;
+      }
+    });
+
+    if (!hasFiles) {
+      zip.addFile('readme.txt', Buffer.from('No backups available yet. Create a booking to generate a backup CSV file.'));
+    }
+
+    const zipBuffer = zip.toBuffer();
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename=bookings_backups_archive.zip');
+    return res.send(zipBuffer);
+  } catch (error) {
+    console.error('Error zipping backups:', error);
+    return res.status(500).json({ message: 'Error generating backups zip archive.' });
   }
 }
